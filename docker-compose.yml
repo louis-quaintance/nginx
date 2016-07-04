@@ -17,6 +17,13 @@ apps:
     - "consul"
     - "registrator"
 
+rabbit:
+  image: harbur/rabbitmq-cluster
+  hostname: rabbit1
+  ports:
+    - "5672:5672"
+    - "15672:15672"
+
 app1:
   extends:
     service: npm
@@ -46,6 +53,7 @@ app2:
   links:
     - "consul"
     - "registrator"
+    - "rabbit"
 
 consul:
   command: -server -bootstrap -advertise 10.0.2.15
