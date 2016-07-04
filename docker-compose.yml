@@ -1,0 +1,65 @@
+node:
+  image: node:4.2
+  volumes:
+    - .:/usr/src/app
+  working_dir: /usr/src/app
+
+npm:
+  extends:
+    service: node
+  entrypoint: npm --harmony
+
+apps:
+  image: nginx
+  links:
+    - "app1"
+    - "app2"
+    - "consul"
+    - "registrator"
+
+app1:
+  extends:
+    service: npm
+  env_file: .env
+  ports:
+    - "3000:3000"
+  command: start
+  environment:
+    SERVICE_NAME: 'app1'
+    SERVICE_CHECK_HTTP: '/health'
+    SERVICE_CHECK_INTERVAL: '5s'
+  links:
+    - "consul"
+    - "registrator"
+
+app2:
+  extends:
+    service: npm
+  env_file: .env
+  ports:
+    - "3001:3001"
+  command: run start2
+  environment:
+    SERVICE_NAME: 'app2'
+    SERVICE_CHECK_HTTP: '/health'
+    SERVICE_CHECK_INTERVAL: '5s'
+  links:
+    - "consul"
+    - "registrator"
+
+consul:
+  command: -server -bootstrap -advertise 10.0.2.15
+  image: progrium/consul:latest
+  ports:
+  - "8300:8300"
+  - "8400:8400"
+  - "8500:8500"
+  - "8600:53/udp"
+
+registrator:
+  command: -ip=10.0.2.15 consul://consul:8500
+  image: gliderlabs/registrator:latest
+  links:
+  - consul
+  volumes:
+  - "/var/run/docker.sock:/tmp/docker.sock"

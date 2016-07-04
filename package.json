@@ -1,0 +1,17 @@
+{
+  "name": "nginx",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app1.js",
+    "start2": "node app2.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "consul": "^0.25.0",
+    "express": "^4.14.0",
+    "request": "^2.72.0"
+  }
+}
